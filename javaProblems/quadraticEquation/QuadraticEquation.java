@@ -1,4 +1,4 @@
-package java.quadraticEquation;
+package javaProblems.quadraticEquation;
 
 public class QuadraticEquation {
 
