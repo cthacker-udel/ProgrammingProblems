@@ -454,6 +454,7 @@ def aoq_interpreter(tape: str) -> None:
         elif command == '±':
             if len(stack) >= 1:
                 stack.insert(0, '+' if stack[0] > 0 else '-')
+        ind += 1
 
 
 if __name__ == '__main__':
