@@ -15,6 +15,6 @@ public class Kata
             { "Rapper", "Cristal" }
         };
 
-        return drinks.ContainsKey(p.ToLower()) ? drinks[p] : "Beer":
+        return drinks.ContainsKey(p.ToLower()) ? drinks[p] : "Beer";
     }
 }
