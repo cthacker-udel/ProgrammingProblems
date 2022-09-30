@@ -2,6 +2,6 @@
 .vscode
 obj
 bin
-.cache
+*.cache
 *.cache
 *.log
