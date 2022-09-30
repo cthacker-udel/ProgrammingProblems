@@ -4,3 +4,4 @@ obj
 bin
 .cache
 *.cache
+*.log
