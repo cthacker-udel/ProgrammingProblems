@@ -1,9 +1,13 @@
 import time
 from pprint import pprint
+from typing import is_typeddict
+import requests
 from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup, ResultSet
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
+
+ALL_COURSE_URL = 'https://udapps.nss.udel.edu/CoursesSearch/search-results?term=2228&search_type=A&course_sec=&session=All&course_title=&instr_name=&text_info=All&campus=&instrtn_mode=All&time_start_hh=&time_start_ampm=&credit=Any&keyword=&geneduc=&subj_area_code=&college='
 
 campus_mapping = {
     'NEWRK': 'Newark',
@@ -50,7 +54,7 @@ def parse_course_name(name: str):
     section_ = ''
     is_number = False
     for i in range(len(name)):
-        if not is_number and name.isdigit():
+        if is_number and name[i].isdigit():
             if len(number_) == 3:
                 section_ += name[i]
             else:
@@ -118,18 +122,21 @@ def parse_course_location(locationstr: str):
 
 def main():
     base_url = 'https://udapps.nss.udel.edu/CoursesSearch/search-results'
-    br = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-    br.get('{}?{}'.format(base_url, generate_search_endpoint('A')))
-    time.sleep(2)
-    soup = BeautifulSoup(br.page_source, "html.parser")
+    page = requests.get('{}?{}'.format(
+        ALL_COURSE_URL, generate_search_endpoint('A')))
+    while (not page):
+        pass
+    soup = BeautifulSoup(page.content, "html.parser")
     course_information = {}
-    odd_rows: ResultSet = soup.find_all('tr', class_='odd')
-    even_rows = soup.find_all('tr', class_='even')
-    for eachrow in odd_rows:
-        [name, number, section] = parse_course_name(eachrow.find(
-            'a', class_='coursenum').string)
-        print(eachrow.contents[3].string)
+    rows: ResultSet = soup.tbody.find_all('tr')
+    for eachrow in rows[:1]:
+        # print(eachrow.contents)
+        [name, number, section] = parse_course_name(
+            eachrow.find('td', class_='course').a.text)
         print([name, number, section])
+        # print([name, number, section])
+        # print(eachrow.contents[3].string)
+        # print([name, number, section])
         # course_title = eachrow.children[1].text()
         # course_campus = eachrow.find('td', class_='campus').text().strip()
         # if course_campus in campus_mapping:
