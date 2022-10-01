@@ -6,8 +6,11 @@ from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup, ResultSet
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
+import re
 
 ALL_COURSE_URL = 'https://udapps.nss.udel.edu/CoursesSearch/search-results?term=2228&search_type=A&course_sec=&session=All&course_title=&instr_name=&text_info=All&campus=&instrtn_mode=All&time_start_hh=&time_start_ampm=&credit=Any&keyword=&geneduc=&subj_area_code=&college='
+not_available = 'N/A'
+course_information = {}
 
 campus_mapping = {
     'NEWRK': 'Newark',
@@ -22,7 +25,7 @@ course_mapping = {
     'T': 'Tuesday',
     'W': 'Wednesday',
     'TR': 'Thursday',
-    'R': 'Friday'
+    'F': 'Friday',
 }
 
 location_mapping = {
@@ -77,16 +80,12 @@ def parse_course_days(daystr: str):
     course_days = []
     if 'M' in daystr:
         course_days.append(course_mapping['M'])
-    elif 'W' in daystr:
+    if 'W' in daystr:
         course_days.append(course_mapping['W'])
-    elif 'F' in daystr:
+    if 'F' in daystr:
         course_days.append(course_mapping['F'])
-    elif 'TR' in daystr:
+    if 'TR' in daystr:
         course_days.append(course_mapping['TR'])
-    elif 'R' in daystr and 'TR' not in daystr:
-        course_days.append(course_mapping['R'])
-    elif 'R' in daystr and daystr.count('R') == 2:
-        course_days.append(course_mapping['R'])
     return course_days
 
 
@@ -97,10 +96,16 @@ def parse_course_time(timestr: str):
     Returns:
         The parsed time of the course, [lower, upper] bounds
     """
-    split_timestr = timestr.replace('PM', '').split(' - ')
+    split_timestr = timestr.split(' - ')
     left_bound = split_timestr[0]
     right_bound = split_timestr[1]
-    return [left_bound, right_bound]
+    if '\n' in right_bound:
+        _ind = right_bound.index('\n')
+        right_bound = right_bound[0:_ind].strip()
+        right_bound = right_bound.replace(
+            'AM' if 'AM' in right_bound else 'PM', '')
+    is_am = 'AM' in right_bound
+    return [left_bound, right_bound, is_am]
 
 
 def parse_course_location(locationstr: str):
@@ -121,44 +126,212 @@ def parse_course_location(locationstr: str):
 
 
 def main():
-    base_url = 'https://udapps.nss.udel.edu/CoursesSearch/search-results'
+    base_url = 'https: // udapps.nss.udel.edu/CoursesSearch/'
+    next_button = None
+    started_searching = False
     page = requests.get('{}?{}'.format(
         ALL_COURSE_URL, generate_search_endpoint('A')))
     while (not page):
         pass
     soup = BeautifulSoup(page.content, "html.parser")
-    course_information = {}
     rows: ResultSet = soup.tbody.find_all('tr')
-    for eachrow in rows[:1]:
-        # print(eachrow.contents)
-        [name, number, section] = parse_course_name(
-            eachrow.find('td', class_='course').a.text)
-        print([name, number, section])
-        # print([name, number, section])
-        # print(eachrow.contents[3].string)
-        # print([name, number, section])
-        # course_title = eachrow.children[1].text()
-        # course_campus = eachrow.find('td', class_='campus').text().strip()
-        # if course_campus in campus_mapping:
-        #     course_campus = campus_mapping[course_campus]
-        # course_credits = eachrow.children[4].text().replace('Hrs', '').strip()
-        # course_days = parse_course_days(
-        #     eachrow.find('td', class_='day').text().strip())
-        # [start, end] = parse_course_time(
-        #     eachrow.find('td', class_='time').text().strip())
-        # course_location = parse_course_location(eachrow.find(
-        #     'td', class_='location').children[0].text().strip())
-        # course_information[name]: dict = {
-        #     course_number: number,
-        #     course_section: section,
-        #     course_title: course_title,
-        #     course_campus: course_campus,
-        #     course_credits: int(course_credits),
-        #     course_days: course_days,
-        #     course_start_time: start,
-        #     course_end_time: end,
-        #     course_location: course_location,
-        # }
+    name = ''
+    number = ''
+    section = ''
+    course_title = ''
+    course_campus = ''
+    course_total_seats = ''
+    course_credits = ''
+    course_day = ''
+    course_time = ''
+    course_location = ''
+    course_teacher = ''
+    course_prereqs = []
+    course_prereqs_or = False
+    course_coreqs = []
+    course_coreqs_or = False
+
+    for eachrow in rows:
+        course_prereqs = []
+        course_prereqs_or = False
+        course_coreqs = []
+        course_coreqs_or = False
+        try:
+            [name, number, section] = parse_course_name(
+                eachrow.find('td', class_='course').a.text)
+        except:
+            name = not_available
+            number = not_available
+            section = not_available
+        try:
+            course_title = eachrow.contents[3].text.strip().split('  ')[
+                0].strip()
+        except:
+            course_title = not_available
+        try:
+            course_campus = campus_mapping[eachrow.find(
+                'td', class_='campus').text.strip()]
+        except:
+            course_campus = not_available
+        try:
+            course_total_seats = eachrow.find(
+                'td', class_='openseats').text.strip().replace('CURRENTLY FULL', '').split(' OF ')[1].strip()
+        except:
+            course_total_seats = not_available
+        try:
+            course_credits = eachrow.find(
+                'td', string=re.compile('Hrs')).text.strip().split(' Hrs')[0]
+        except:
+            course_credits = not_available
+        try:
+            course_day = parse_course_days(
+                eachrow.find('td', class_='day').text.strip())
+        except:
+            course_day = not_available
+        try:
+            course_time = parse_course_time(
+                eachrow.find('td', class_='time').text.strip())
+        except:
+            course_time = not_available
+        try:
+            course_location = parse_course_location(
+                eachrow.find('td', class_='location').a.text.strip())
+        except:
+            course_location = not_available
+        try:
+            course_teacher = eachrow.contents[len(
+                eachrow.contents) - 4].text.strip()
+        except:
+            course_teacher = not_available
+        stored_result = {}
+        stored_result['name'] = name
+        stored_result['number'] = number
+        stored_result['section'] = section
+        stored_result['title'] = course_title
+        stored_result['campus'] = course_campus
+        stored_result['total_seats'] = course_total_seats
+        stored_result['credits'] = course_credits
+        stored_result['day'] = course_day
+        stored_result['course_time'] = course_time
+        stored_result['location'] = course_location
+        stored_result['teacher'] = course_teacher
+        try:
+            course_detail_link = eachrow.find_all(
+                'a', class_='coursenum')[0]['href']
+            url_ = f'{base_url}{course_detail_link}'.replace(
+                ' // ', '//').replace('§ion', '&section')
+            course_detail_page = requests.get(
+                url_)
+            souped_content = BeautifulSoup(
+                course_detail_page.content, 'html.parser')
+            pre_req_paragraphs = souped_content.find_all(
+                'p', string=re.compile('PREREQ|Prerequisites'))
+            for eachsoupparagraph in pre_req_paragraphs:
+                if 'PREREQ' in eachsoupparagraph.text:
+                    eachparagraph = eachsoupparagraph.text
+                    capital_ind = eachparagraph.index('PREREQ')
+                    capital_start = eachparagraph[capital_ind + 6:]
+                    capital_second_start = capital_start.index(name)
+                    capital_start = capital_start[capital_second_start:]
+                    capital_end_index = capital_start.index('.')
+                    capital_substr = capital_start[0:capital_end_index]
+                    if 'or' in capital_substr:
+                        split_ors = capital_substr.split(' or ')
+                        for eachclass in split_ors:
+                            if eachclass not in course_prereqs:
+                                course_prereqs.append(eachclass.strip())
+                        course_prereqs_or = True
+                    elif 'and' in capital_substr:
+                        split_and = capital_substr.split(' and ')
+                        for eachclass in split_and:
+                            if eachclass not in course_prereqs:
+                                course_prereqs.append(eachclass.strip())
+                    else:
+                        capital_substr = capital_substr.strip()
+                        if capital_substr not in course_prereqs:
+                            course_prereqs.append(capital_substr)
+                elif 'Prerequisites' in eachparagraph.text:
+                    lowercase_ind = eachparagraph.index('Prerequisites:')
+                    capital_start = eachparagraph[lowercase_ind + 14:]
+                    capital_second_start = capital_start.index(name)
+                    capital_start = capital_start[capital_second_start:]
+                    capital_end_index = capital_start.index('.')
+                    capital_substr = capital_start[0:capital_end_index]
+                    if 'or' in capital_substr:
+                        split_ors = capital_substr.split(' or ')
+                        for eachclass in split_ors:
+                            if eachclass not in course_prereqs:
+                                course_prereqs.append(eachclass.strip())
+                        course_prereqs_or = True
+                    elif 'and' in capital_substr:
+                        split_and = capital_substr.split(' and ')
+                        for eachclass in split_and:
+                            if eachclass not in course_prereqs:
+                                course_prereqs.append(eachclass.strip())
+                    else:
+                        capital_substr = capital_substr.strip()
+                        if capital_substr not in course_prereqs:
+                            course_prereqs.append(capital_substr)
+            if len(course_prereqs) > 0:
+                course_prereqs.append(course_prereqs_or)
+        except:
+            pass
+        try:
+            coreq_paragraphs = souped_content.find_all(
+                'p', string=re.compile('COREQ|Corequisites'))
+            for eachsoupparagraph in coreq_paragraphs:
+                if 'COREQ' in eachsoupparagraph.text:
+                    eachparagraph = eachsoupparagraph.text
+                    capital_ind = eachparagraph.index('COREQ')
+                    capital_start = eachparagraph[capital_ind + 6:]
+                    capital_second_start = capital_start.index(name)
+                    capital_start = capital_start[capital_second_start:]
+                    capital_end_index = capital_start.index('.')
+                    capital_substr = capital_start[0:capital_end_index]
+                    if 'or' in capital_substr:
+                        split_ors = capital_substr.split(' or ')
+                        for eachclass in split_ors:
+                            if eachclass not in course_coreqs:
+                                course_coreqs.append(eachclass.strip())
+                        course_coreqs_or = True
+                    elif 'and' in capital_substr:
+                        split_and = capital_substr.split(' and ')
+                        for eachclass in split_and:
+                            if eachclass not in course_coreqs:
+                                course_coreqs.append(eachclass.strip())
+                    else:
+                        capital_substr = capital_substr.strip()
+                        if capital_substr not in course_coreqs:
+                            course_coreqs.append(capital_substr)
+                elif 'Corequisites' in eachparagraph.text:
+                    lowercase_ind = eachparagraph.index('Corequisites:')
+                    capital_start = eachparagraph[lowercase_ind + 14:]
+                    capital_second_start = capital_start.index(name)
+                    capital_start = capital_start[capital_second_start:]
+                    capital_end_index = capital_start.index('.')
+                    capital_substr = capital_start[0:capital_end_index]
+                    if 'or' in capital_substr:
+                        split_ors = capital_substr.split(' or ')
+                        for eachclass in split_ors:
+                            if eachclass not in course_coreqs:
+                                course_coreqs.append(eachclass.strip())
+                        course_coreqs_or = True
+                    elif 'and' in capital_substr:
+                        split_and = capital_substr.split(' and ')
+                        for eachclass in split_and:
+                            if eachclass not in course_coreqs:
+                                course_coreqs.append(eachclass.strip())
+                    else:
+                        capital_substr = capital_substr.strip()
+                        if capital_substr not in course_coreqs:
+                            course_coreqs.append(capital_substr)
+            if len(course_coreqs) > 0:
+                course_coreqs.append(course_coreqs)
+        except:
+            pass
+        stored_result['prereqs'] = course_prereqs
+        stored_result['coreqs'] = course_coreqs
+        course_information[f'{name}{number}{section}'] = stored_result
     pprint(course_information)
 
 
