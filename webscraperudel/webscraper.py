@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup, ResultSet
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 import re
 import json
 
@@ -137,6 +138,7 @@ def main():
     course_code_input = None
     course_code_keyword = None
     course_code_filter_button = None
+    course_code_select = None
     time.sleep(2)
 
 
@@ -249,8 +251,9 @@ def main():
             except:
                 course_location = not_available
             try:
+                teacher_newline_index = eachrow.contents[len(eachrow.contents) - 4].text.strip().index('\n')
                 course_teacher = eachrow.contents[len(
-                    eachrow.contents) - 4].text.strip()
+                    eachrow.contents) - 4].text.strip()[:teacher_newline_index].strip()
             except:
                 course_teacher = not_available
             stored_result = {}
@@ -296,6 +299,10 @@ def main():
                             for eachclass in split_and:
                                 if eachclass not in course_prereqs:
                                     course_prereqs.append(eachclass.strip())
+                        elif ', ' in capital_substr:
+                            split_comma = capital_substr.split(', ')
+                            for eachclass in split_comma:
+                                course_prereqs.append(eachclass.strip())
                         else:
                             capital_substr = capital_substr.strip()
                             if capital_substr not in course_prereqs:
@@ -318,6 +325,10 @@ def main():
                             for eachclass in split_and:
                                 if eachclass not in course_prereqs:
                                     course_prereqs.append(eachclass.strip())
+                        elif ', ' in capital_substr:
+                            split_comma = capital_substr.split(', ')
+                            for eachclass in split_comma:
+                                course_prereqs.append(eachclass.strip())
                         else:
                             capital_substr = capital_substr.strip()
                             if capital_substr not in course_prereqs:
@@ -349,6 +360,10 @@ def main():
                             for eachclass in split_and:
                                 if eachclass not in course_coreqs:
                                     course_coreqs.append(eachclass.strip())
+                        elif ', ' in capital_substr:
+                            split_comma = capital_substr.split(', ')
+                            for eachclass in split_comma:
+                                course_coreqs.append(eachclass.strip())
                         else:
                             capital_substr = capital_substr.strip()
                             if capital_substr not in course_coreqs:
@@ -371,6 +386,10 @@ def main():
                             for eachclass in split_and:
                                 if eachclass not in course_coreqs:
                                     course_coreqs.append(eachclass.strip())
+                        elif ', ' in capital_substr:
+                            split_comma = capital_substr.split(', ')
+                            for eachclass in split_comma:
+                                course_coreqs.append(eachclass.strip())
                         else:
                             capital_substr = capital_substr.strip()
                             if capital_substr not in course_coreqs:
@@ -389,14 +408,20 @@ def main():
                     course_code_input = None
                 if course_code_input:
                     course_code_input.send_keys(number)
-                try:
-                    course_code_keyword = firefox_scraper.find_element(
-                        By.ID, 'course_filter_keyword')
-                except:
-                    course_code_keyword = None
-                if course_code_keyword:
-                    course_code_keyword.send_keys(name)
                 searched_courses.append([name, number])
+                try:
+                    course_code_select = Select(
+                        firefox_scraper.find_element(By.ID, "courseprefix"))
+                except:
+                    course_code_select = None
+                if course_code_select:
+                    try:
+                        course_code_select.select_by_visible_text(name)
+                    except:
+                        course_code_keyword = firefox_scraper.find_element(
+                            By.ID, "course_filter_keyword")
+                        if course_code_keyword:
+                            course_code_keyword.send_keys(name)
                 try:
                     course_code_filter_button = firefox_scraper.find_element(
                         By.ID, 'search-with-filters')
@@ -405,7 +430,7 @@ def main():
                 if course_code_filter_button:
                     course_code_filter_button.click()
 
-                time.sleep(2)
+                time.sleep(5)
                 course_info_available = False
                 try:
                     course_link = firefox_scraper.find_element(
@@ -451,12 +476,12 @@ def main():
                             elif 'Course Typically Offered' in eachnode.text:
                                 break
                             elif breadth_found and 'Breadth' not in eachnode and len(eachnode.text.strip()) > 0:
-                                if course_breadth_requirements['UNIV']:
+                                if 'UNIV ' in course_breadth_requirements:
                                     course_breadth_requirements['UNIV'] = course_breadth_requirements['UNIV'] + [
-                                        eachnode]
+                                        eachnode.text.strip()]
                                 else:
                                     course_breadth_requirements['UNIV'] = [
-                                        eachnode]
+                                        eachnode.text.strip()]
                     if course_code_input:
                         firefox_scraper.find_element(
                             By.ID, 'coursenumber').clear()
