@@ -160,7 +160,11 @@ def main():
         while (not page):
             pass
         soup = BeautifulSoup(page.content, "html.parser")
-        rows: ResultSet = soup.tbody.find_all('tr')
+        rows = soup.tbody
+        if rows:
+            rows = rows.find_all('tr')
+        else:
+            rows = []
         next_button = soup.find(id='searchNxtBtn')
         name = ''
         number = ''
