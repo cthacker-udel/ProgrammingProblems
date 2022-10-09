@@ -499,9 +499,13 @@ def main():
                 course_educational_objectives = cached_ed_breadth_results[f'{name}{number}'][1]
             stored_result['breadth'] = course_breadth_requirements
             stored_result['education_objectives'] = course_educational_objectives
+            stored_result['id'] = f'{name}{number}{section}'
             course_information[f'{name}{number}{section}'] = stored_result
     with open('courses.json', 'w') as outfile:
-        json.dump(course_information, outfile)
+        output_array = []
+        for eachkey in course_information:
+            output_array.append(course_information[eachkey])
+        json.dump(output_array, outfile)
 
 
 if __name__ == '__main__':
