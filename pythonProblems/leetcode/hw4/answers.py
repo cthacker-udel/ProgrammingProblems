@@ -17,10 +17,9 @@ def max_rod_price_cost(n_len: int, prices: List[int], cost: int) -> int:
 ## problem2
 def lengthOfLIS(self, nums: List[int]) -> int:
     dp = [1] * len(nums)
-    n = len(nums) - 1
-    dp[n] = 1
     for i in range(len(nums) - 1, -1, -1):
         for j in range(i + 1, len(nums)):
-            dp[i] = max(dp[i], 1 + dp[j] if nums[i] < nums[j] else 0)
+            if nums[i] < nums[j]:
+                dp[i] = max(dp[i], 1 + dp[j])
     return max(dp)
 

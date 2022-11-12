@@ -13,39 +13,31 @@ from typing import List, Union
 class Solution:
 
     def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        sorted_nums = sorted(nums)
         pairs = []
-        for i in range(len(nums)):
-            for j in range(len(nums)):
-                for k in range(len(nums)):
-                    elem_i = nums[i]
-                    elem_j = nums[j]
-                    elem_k = nums[k]
-                    diff = target - (elem_i + elem_j + elem_k)
-                    if i != j and j != k and k != i:
-                        altered_arr = nums[:]
-                        indexes = sorted([i, j, k])
-                        del altered_arr[indexes[2]]
-                        del altered_arr[indexes[1]]
-                        del altered_arr[indexes[0]]
-                        if diff in altered_arr:
-                            sorted_pair = sorted(
-                                [diff, elem_i, elem_j, elem_k])
-                            if sorted_pair not in pairs:
-                                pairs.append(sorted_pair)
-        return pairs
+        for ind, elem in enumerate(sorted_nums):
+            for ind2, elem2 in enumerate(sorted_nums):
+                if ind2 != ind:
+                    ## l, r sol
+                    l = 0
+                    r = len(sorted_nums) - 1
+                    ## summing to second number
+                    the_sum = sorted_nums[l] + sorted_nums[r]
+                    while l != r:
+                        if the_sum < elem2:
+                            l += 1
+                        elif the_sum > elem2:
+                            r += 1
+                        elif the_sum == elem2:
+                            pairs.append([elem, elem2])
+
+                        
+
+        
 
 
 if __name__ == '__main__':
-    nums = [2, 2, 2, 2, 2]
-    target = 8
+    nums = [-3,-2,-1,0,0,1,2,3]
+    target = 0
     sol = Solution()
-    print(sol.fourSum(nums, target))
-
-    # def threeSum(self, nums: List[int], target: int) -> Union[List[int], None]:
-    #     for i in range(len(nums)):
-    #         result = target - nums[i]
-    #         if result in nums:
-    #             j = nums.index(result)
-    #             result = Solution.twoSum(self, nums[:j] + nums[j + 1:], result)
-    #             return [target] + result if result != None else []
-    #     return None
+    sol.fourSum(nums, target)

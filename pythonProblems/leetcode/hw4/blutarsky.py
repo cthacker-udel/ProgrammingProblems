@@ -70,12 +70,14 @@ def get_guest_list(root: Node, table: dict | None = None) -> tuple[list[Node], i
 
 
 computed_nodes: dict = {}
-list_sums = {}
+level_sums = {}
 
 
 def get_guest_list_v2(node: Node | None, level: int = 0) -> int:
     if node == None:
         return 0
+    if node.name in computed_nodes:
+        return computed_nodes[node.name]
     # grandchildren sum vs child sums
     # first compute grandchild sums + grandchild right sums, then compute children sums
     max_sum = node.rating
@@ -87,9 +89,17 @@ def get_guest_list_v2(node: Node | None, level: int = 0) -> int:
         max_sum = max(max_sum, get_guest_list_v2(node.left_child, level + 1))
     if node.right_sib:  # RIGHT CHILD SUM
         # if it doesn't have a grandchild, access it's right sib sum, that sums up the grandchild sum of the right children
-        max_sum = get_guest_list_v2(node.right_sib, level)
+        max_sum += get_guest_list_v2(node.right_sib, level)
+    else:
+        ## when we reach a point where we can't go anymore right, we add the level sum onto the node, if it has a grandchild, that ensures we return an accurate value
+        if node.left_child is not None and level + 2 in level_sums:
+            max_sum += level_sums[level + 2]
     print(node.name)
     print(level, max_sum)
+    computed_nodes[node.name] = max_sum
+    level_sums[level] = max_sum ## switch to just setting it equal to max_sum, since we are already appending it
+    print(level_sums)
+    print(computed_nodes)
     return max_sum
 
 
@@ -98,6 +108,14 @@ def print_guest_list(guests: list[Node]) -> None:
     print("GUESTS:")
     for guest in guests:
         print(guest.name, guest.rating)
+
+
+def print_tree(node: Node) -> None:
+    if node is None:
+        return
+    print(f'[NAME {node.name} VAL {node.rating}] [LC {node.left_child.name if node.left_child else "N/A"}] | [RC {node.right_sib.name if node.right_sib else "N/A"}]')
+    print_tree(node.left_child)
+    print_tree(node.right_sib)
 
 
 if __name__ == "__main__":
@@ -159,6 +177,8 @@ if __name__ == "__main__":
 
         #print(great_grand1.name, great_grand1.right_sib)
 
-    guests, ratings = get_guest_list_v2(root_2)
-    print(ratings)
-    print_guest_list(guests)
+    # print_tree(root_2)
+    # guests, ratings = get_guest_list(root_2)
+    rating = get_guest_list_v2(root_2)
+    # print(ratings)
+    # print_guest_list(guests)
