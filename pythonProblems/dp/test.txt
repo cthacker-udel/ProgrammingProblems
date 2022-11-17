@@ -1,0 +1,4 @@
+>Sequence 1
+taccagta
+>Sequence 2
+aggcat
