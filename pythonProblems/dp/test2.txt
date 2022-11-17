@@ -1,4 +1,0 @@
->Sequence 1
-atcg
->Sequence 2
-aattccgg
