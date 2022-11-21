@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaxProduct", "MaxProduct\Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KReverse", "KReverse\KReverse.csproj", "{CDC83591-94C3-4F36-BEF1-A9809EE8FBBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ball", "Ball\Ball.csproj", "{5F4AA865-A19B-42C9-9E0F-8193F864A885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "decodeMorse", "decodeMorse\decodeMorse.csproj", "{B68016CF-D9FE-4E52-B41D-B3BB56C6F482}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +76,13 @@ Global
 		{CDC83591-94C3-4F36-BEF1-A9809EE8FBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDC83591-94C3-4F36-BEF1-A9809EE8FBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDC83591-94C3-4F36-BEF1-A9809EE8FBBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F4AA865-A19B-42C9-9E0F-8193F864A885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F4AA865-A19B-42C9-9E0F-8193F864A885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F4AA865-A19B-42C9-9E0F-8193F864A885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F4AA865-A19B-42C9-9E0F-8193F864A885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68016CF-D9FE-4E52-B41D-B3BB56C6F482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68016CF-D9FE-4E52-B41D-B3BB56C6F482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68016CF-D9FE-4E52-B41D-B3BB56C6F482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68016CF-D9FE-4E52-B41D-B3BB56C6F482}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
