@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2015"],
+    "lib": ["es2015", "DOM"],
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
