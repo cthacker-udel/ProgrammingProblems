@@ -5,3 +5,5 @@ bin
 *.cache
 *.cache
 *.log
+
+tsProblems/node_modules
