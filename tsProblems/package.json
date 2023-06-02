@@ -10,6 +10,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/autocannon": "^7.9.0",
     "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "autocannon": "^7.11.0"
   }
 }
