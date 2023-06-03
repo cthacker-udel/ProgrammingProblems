@@ -125,3 +125,134 @@ dt_4_second = dt_4_anti_first_diag + dt_4_anti_second_diag + dt_4_anti_third_dia
 dt_4 = dt_4_first - dt_4_second
 
 print("dt4 = {}".format(dt_4))
+
+
+# 4a + 3b = 6
+# 1a - 5b = 8
+
+# a = 0 b = 2
+
+# Solution is non-singular, as the second row cannot be replicated from the first row,
+# so therefore, the first row is linearly independent.
+
+# 4a + 3b + 1c = 6
+# 1a - 5b + 7c = 8
+# 5a - 2b + 8c = 14
+
+# 4a + 3b + 1c
+# 1a - 5b + 7c
+
+
+# 5a + - 2b + 8c
+
+# Since row 3 can be replicated from row 1 by adding them together, the
+# system is singular, and is redundant, therefore the third row
+# is linearly dependant
+
+
+# divide by coefficient of a
+# 5a + b = 17
+# 4a - 3b = 6
+
+# Dividing first equation by 5 and second one by 4 gives us
+
+# a + b/5 = 3.4
+# a - 0.75b = 1.5
+
+# subtract first equation from the second one to remove a
+
+#   a - 0.75b = 1.5
+# - a + 0.2b  = 3.4
+
+#   0a - 0.95b = -1.9 # Divide by -0.95 on both sides to get
+#   b = 2
+
+# to find A
+# a + 0.2(2) = 3.4
+# a + 0.4 = 3.4
+# a = 3
+
+
+# 2a + 5b = 46
+# 8a + b = 32
+
+# Eliminate a from the equation
+
+# Divide by coefficient of a
+# a + 2.5b = 23
+# a + .125b = 4
+
+# Subtract first from second
+
+#    a + .125b = 4
+# -  a + 2.5b = 23
+#      - 2.375b = -19
+#     b = 8.0
+
+
+# a + 2.5(8) = 23
+# a + 20 = 23
+# a = 3
+
+# 5a + b = 11
+# 10a + 2b = 22
+
+
+# a + b/5 = 2.2
+# a + b/5 = 2.2
+
+
+# a = x
+# b = (2.2 - x) / 5
+
+# a  +  b  +   2c = 12
+# 3a - 3b - c     = 3
+# 2a - b  +  6c   = 24
+
+# # Divide each row by the coefficient of a
+# # a + b + 2c =   12
+# # a - b - c/3 =  1
+# # a - b/2 + 3c = 12
+
+#   a - b/2 + 3c = 12
+# - a + b   + 2c = 12
+# ---------------------
+#   0a -1.5b + c = 0
+
+
+#   a - b - c/3 = 1
+# - a + b + 2c  = 12
+# --------------------
+#   0a -2b -2.3c = -11
+
+# 1st:
+# -2b - 2.3c = -11
+
+# 2nd:
+# -1.5b + c = 0
+
+# # Divide by the coefficients
+
+# 1st:
+
+# b -2.3/-2c = -11/-2
+# b + 7/6c = 11/2
+
+# 2nd:
+# b - c/1.5 = 0
+
+# Subtract 1st from 2nd
+
+#   b - 2/3c = 0
+# - b + 7/6c = 11/2
+# -------------------------------
+#     -1 * (2/3 + 7/6)c = -11/2
+
+# -11/6c = -11/2
+# c = 3
+
+# b + 7/6(3) = 11/2
+# b = 2
+
+# a + 2 + 2(3) = 12
+# a = 4
