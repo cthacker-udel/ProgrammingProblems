@@ -101,3 +101,40 @@ print(dt_1_full - dt_1_anti_full)
 # - 0.21x - 0.12z = -780
 
 # 2.79x + 0.12z
+
+# mat1 = [[5, 1], [-1, 3]]
+
+# dt_1 = mat1[0][0] * mat1[1][1]
+# dt_2 = mat1[0][1] * mat1[1][0]
+
+
+# print(dt_1 - dt_2)
+
+
+# mat1 = [[2, -1], [-6, 3]]
+
+# dt_1 = mat1[0][0] * mat1[1][1]
+# dt_2 = mat1[0][1] * mat1[1][0]
+
+# print(dt_1 - dt_2)
+
+
+# mat1 = [[7, 5, 3], [3, 2, 5], [1, 2, 1]]
+
+# dt_1_first = mat1[0][0] * mat1[1][1] * mat1[2][2]
+# dt_1_second = mat1[0][1] * mat1[1][2] * mat1[2][0]
+# dt_1_third = mat1[0][2] * mat1[1][0] * mat1[2][1]
+
+# dt_anti_1_first = mat1[0][2] * mat1[1][1] * mat1[2][0]
+# dt_anti_1_second = mat1[0][1] * mat1[1][0] * mat1[2][2]
+# dt_anti_1_third = mat1[0][0] * mat1[1][2] * mat1[2][1]
+
+# dt_1_front = dt_1_first + dt_1_second + dt_1_third
+# dt_1_anti = dt_anti_1_first + dt_anti_1_second + dt_anti_1_third
+
+# print(dt_1_front - dt_1_anti)
+
+
+# 7f + 5a + 3c = 120
+# 3f + 2a + 5c = 70
+# f + 2a + c = 20
