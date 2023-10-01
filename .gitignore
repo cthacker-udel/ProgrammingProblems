@@ -7,3 +7,4 @@ bin
 *.log
 
 tsProblems/node_modules
+secret
